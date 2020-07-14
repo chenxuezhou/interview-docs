@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>图像处理</title>
+
+
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    window.onload = function () {
+      var img = new Image();
+      img.src = "1.jpg";
+      var canvas = document.querySelector("#canvas");
+      // 加载完成图片之后才能够执行canvas的操作
+      img.onload = function () {
+        
+        var cxt = canvas.getContext("2d");
+        //背景大小
+        canvas.width = img.width;
+        canvas.height = img.height;
+        // cxt.drawImage(img, 0, 0, img.width, img.height);
+        var imageData = cxt.getImageData(0, 100, canvas.width, 200);
+        var imageData_length = imageData.data.length / 4;
+        var newImage=[]
+        // for (var i = 100; i < 200; i++) {
+        //   for (var j = 0; j < canvas.width; j++) {
+        //     newImage[((i-100)*canvas.width+j)*4]=imageData.data[(i*canvas.width+j) * 4];
+            
+        //   }
+        // }
+        newImage=imageData.data.slice(canvas.width*4*100,canvas.width*4*200)
+        // 解析之后进行算法运算
+        // for (var i = 0; i < imageData_length; i++) {
+        //   var red = imageData.data[i * 4];
+        //   var green = imageData.data[i * 4 + 1];
+        //   var blue = imageData.data[i * 4 + 2];
+        //   var gray = 0.3 * red + 0.59 * green + 0.11 * blue;
+        //   imageData.data[i * 4] = gray;
+        //   imageData.data[i * 4 + 1] = gray;
+        //   imageData.data[i * 4 + 2] = gray;
+        // }
+        imageData.data=newImage
+        cxt.drawImage(img, 0, 0, img.width, img.height);
+        // cxt.putImageData(imageData, 0, 0);
+      }
+      // img.src= canvas.toDataURL('image/png')
+    }
+  </script>
+</body>
+
+</html>

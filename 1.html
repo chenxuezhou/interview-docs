@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>js实现图片裁剪</title>
+</head>
+<body>
+<input id="npt" type="file">
+<br>
+原图：<img id="original" src="" alt="">
+裁剪后：<img id="later" src="" alt="">
+</body>
+<script>
+    var canvas = document.createElement("canvas");// 创建canvas对象
+    var ctx = canvas.getContext('2d');
+
+    var original = document.querySelector("#original");
+    var later = document.querySelector("#later");
+    var clone = [{x:170,y:100},{xx:300,yy:520}];//x y为要裁剪的左上角的坐标，xx yy为右下角的坐标
+
+
+    // 获取图片base64数据
+    var npt = document.getElementById("npt");
+    npt.onchange = function () {
+        var reader = new FileReader();
+        reader.readAsDataURL(npt.files[0]);
+        reader.onloadend = function (e) {
+            original.src = e.target.result;
+            // console.log(e.target.result);// 图片的base64数据
+            getImage(e.target.result)
+        };
+    };
+
+    // 创建图片
+    var getImage = function(b64){
+        // 创建图片对象
+        var image = new Image();
+        image.src = `${b64}`;
+        image.onload = function(){
+            // 获取原图宽高
+            var height = this.height;
+            var width = this.width;
+            //设置canvas大小与原图宽高一致
+            canvas.height = height;
+            canvas.width = width;
+            // 在canvas绘制图片
+            ctx.drawImage(this,0, 0,width,height);
+            // 截图：
+            drawRect();
+        }
+    };
+
+    // 绘制截图矩阵
+    var drawRect = function (){
+        // 截图宽度
+        var w = clone[1].xx - clone[0].x;
+        // 截图高度
+        var h = clone[1].yy - clone[0].y;
+        // 获取截图区域内容,截图区域的像素点矩阵
+        var cutImage = ctx.getImageData(clone[0].x,clone[0].y,w,h);
+        // 裁剪后的base64数据
+        var newImage = createNewCanvas(cutImage,w,h);
+        later.src = newImage;
+        // console.log(details_img);// 裁剪后的base64数据
+    };
+
+    //创建新的空白canvas画布将矩阵渲染截图
+    var createNewCanvas = function (content,width,height){
+        var nCanvas = document.createElement('canvas');
+        var nCtx = nCanvas.getContext('2d');
+        nCanvas.width = width;
+        nCanvas.height = height;
+        nCtx.putImageData(content,0,0);// 将画布上指定矩形的像素数据，通过 putImageData() 方法将图像数据放回画布
+        return nCanvas.toDataURL('image/png');
+    }
+</script>
+</html>
